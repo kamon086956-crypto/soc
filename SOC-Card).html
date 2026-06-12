@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FM-HSE-06-01 | SOC Card | Safety Observation Card</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', 'TH Sarabun New', sans-serif; background: #f0f4f8; color: #1a1a2e; }
+
+  .page-header {
+    background: linear-gradient(135deg, #1F3864 0%, #2E75B6 100%);
+    color: white; padding: 18px 24px; display: flex; align-items: center; justify-content: space-between;
+  }
+  .page-header h1 { font-size: 18px; font-weight: 700; }
+  .page-header .doc-id { font-size: 12px; opacity: 0.8; margin-top: 3px; }
+  .badge { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); border-radius: 6px; padding: 6px 12px; text-align: center; font-size: 11px; }
+
+  .container { max-width: 800px; margin: 20px auto; padding: 0 16px 40px; }
+
+  .section-card {
+    background: white; border-radius: 12px; margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08); overflow: hidden;
+  }
+  .section-title {
+    background: #1F3864; color: white; padding: 10px 16px;
+    font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 8px;
+  }
+  .section-title .sub { font-weight: 400; opacity: 0.8; font-size: 12px; }
+  .section-body { padding: 16px; }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .form-row.full { grid-template-columns: 1fr; }
+  .form-row.three { grid-template-columns: 1fr 1fr 1fr; }
+
+  .field label { display: block; font-size: 12px; font-weight: 600; color: #1F3864; margin-bottom: 4px; }
+  .field label .en { font-weight: 400; color: #666; }
+  .field input, .field select, .field textarea {
+    width: 100%; border: 1.5px solid #ddd; border-radius: 8px; padding: 9px 12px;
+    font-size: 14px; font-family: inherit; transition: border-color 0.2s;
+    background: #fafafa; color: #1a1a2e;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    outline: none; border-color: #2E75B6; background: white; box-shadow: 0 0 0 3px rgba(46,117,182,0.1);
+  }
+  .field textarea { resize: vertical; min-height: 80px; }
+
+  /* Risk Level Selector */
+  .risk-selector { display: flex; gap: 10px; }
+  .risk-btn {
+    flex: 1; padding: 12px 8px; border: 2px solid #ddd; border-radius: 10px;
+    cursor: pointer; text-align: center; transition: all 0.2s; background: white;
+    font-family: inherit;
+  }
+  .risk-btn .emoji { font-size: 22px; display: block; }
+  .risk-btn .label { font-size: 13px; font-weight: 700; display: block; margin-top: 4px; }
+  .risk-btn .sublabel { font-size: 10px; color: #888; display: block; margin-top: 2px; }
+  .risk-btn .timeline { font-size: 10px; font-weight: 600; display: block; margin-top: 4px; }
+
+  .risk-btn[data-level="HIGH"].active, .risk-btn[data-level="HIGH"]:hover { border-color: #e53e3e; background: #fff5f5; }
+  .risk-btn[data-level="HIGH"].active .label { color: #c53030; }
+  .risk-btn[data-level="HIGH"] .timeline { color: #c53030; }
+
+  .risk-btn[data-level="MEDIUM"].active, .risk-btn[data-level="MEDIUM"]:hover { border-color: #d69e2e; background: #fffff0; }
+  .risk-btn[data-level="MEDIUM"].active .label { color: #b7791f; }
+  .risk-btn[data-level="MEDIUM"] .timeline { color: #b7791f; }
+
+  .risk-btn[data-level="LOW"].active, .risk-btn[data-level="LOW"]:hover { border-color: #38a169; background: #f0fff4; }
+  .risk-btn[data-level="LOW"].active .label { color: #276749; }
+  .risk-btn[data-level="LOW"] .timeline { color: #276749; }
+
+  /* Type Selector */
+  .type-selector { display: flex; gap: 8px; flex-wrap: wrap; }
+  .type-btn {
+    padding: 8px 16px; border: 2px solid #ddd; border-radius: 20px;
+    cursor: pointer; font-size: 13px; font-family: inherit; background: white; transition: all 0.2s;
+  }
+  .type-btn:hover { border-color: #2E75B6; color: #2E75B6; }
+  .type-btn.active { border-color: #1F3864; background: #1F3864; color: white; }
+
+  /* Photo Upload */
+  .photo-drop {
+    border: 2px dashed #ccc; border-radius: 10px; padding: 24px;
+    text-align: center; cursor: pointer; transition: all 0.2s; background: #fafafa;
+  }
+  .photo-drop:hover { border-color: #2E75B6; background: #f0f7ff; }
+  .photo-drop input { display: none; }
+  .photo-drop .icon { font-size: 32px; }
+  .photo-drop p { color: #888; font-size: 13px; margin-top: 8px; }
+  .photo-previews { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+  .photo-preview { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 2px solid #ddd; }
+
+  /* Submit */
+  .submit-btn {
+    width: 100%; padding: 16px; background: linear-gradient(135deg, #1F3864, #2E75B6);
+    color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 700;
+    cursor: pointer; font-family: inherit; transition: transform 0.1s, opacity 0.2s;
+    margin-top: 8px;
+  }
+  .submit-btn:hover { opacity: 0.92; transform: translateY(-1px); }
+  .submit-btn:active { transform: translateY(0); }
+
+  /* Confirmation */
+  .confirmation {
+    display: none; background: white; border-radius: 12px; padding: 32px;
+    text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    margin-bottom: 16px;
+  }
+  .confirmation.visible { display: block; }
+  .check-icon { width: 64px; height: 64px; background: #38a169; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;
+    font-size: 28px; }
+  .soc-number { font-size: 28px; font-weight: 900; color: #1F3864; }
+  .confirmation p { color: #666; margin-top: 8px; font-size: 14px; }
+  .new-soc-btn {
+    margin-top: 20px; padding: 12px 28px; background: #1F3864; color: white;
+    border: none; border-radius: 8px; font-size: 14px; cursor: pointer; font-family: inherit;
+  }
+
+  /* Alert banner for HIGH risk */
+  .high-risk-alert {
+    display: none; background: #fff5f5; border: 2px solid #e53e3e; border-radius: 10px;
+    padding: 12px 16px; margin-top: 12px; color: #c53030; font-size: 13px; font-weight: 600;
+  }
+  .high-risk-alert.visible { display: block; }
+
+  /* Required field indicator */
+  .req { color: #e53e3e; }
+
+  @media (max-width: 500px) {
+    .form-row { grid-template-columns: 1fr; }
+    .form-row.three { grid-template-columns: 1fr 1fr; }
+    .risk-selector { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div>
+    <h1>📋 SOC Card — ใบรายงานข้อสังเกตด้านความปลอดภัย</h1>
+    <div class="doc-id">FM-HSE-06-01 | Safety Observation Card | WI-HSE-06 Rev.00</div>
+  </div>
+  <div class="badge">
+    <div style="font-size:16px;">🎯</div>
+    <div>เป้า 2 ใบ</div>
+    <div>ต่อคนต่อเดือน</div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- Confirmation (hidden until submit) -->
+  <div class="confirmation" id="confirmation">
+    <div class="check-icon">✅</div>
+    <div class="soc-number" id="soc-number-display">SOC-2024-001</div>
+    <p style="font-size:16px; font-weight:600; margin-top:12px;">บันทึก SOC Card สำเร็จ!</p>
+    <p>SOC Card has been submitted successfully.</p>
+    <p style="margin-top:8px;" id="conf-risk-msg"></p>
+    <button class="new-soc-btn" onclick="resetForm()">➕ รายงานข้อสังเกตใหม่ / New Observation</button>
+  </div>
+
+  <!-- Form -->
+  <form id="soc-form">
+
+    <!-- Section 1: Reporter Info -->
+    <div class="section-card">
+      <div class="section-title">👤 ข้อมูลผู้รายงาน <span class="sub">Reporter Information</span></div>
+      <div class="section-body">
+        <div class="form-row">
+          <div class="field">
+            <label>ชื่อ-สกุล <span class="en">Reporter Name</span> <span class="req">*</span></label>
+            <input type="text" id="reporter-name" placeholder="ชื่อ-นามสกุล / Full Name" required>
+          </div>
+          <div class="field">
+            <label>แผนก / ตำแหน่ง <span class="en">Dept / Position</span></label>
+            <input type="text" id="reporter-dept" placeholder="เช่น Production / Operator">
+          </div>
+        </div>
+        <div class="form-row three">
+          <div class="field">
+            <label>วันที่ <span class="en">Date</span> <span class="req">*</span></label>
+            <input type="date" id="obs-date" required>
+          </div>
+          <div class="field">
+            <label>เวลา <span class="en">Time</span> <span class="req">*</span></label>
+            <input type="time" id="obs-time" required>
+          </div>
+          <div class="field">
+            <label>เบอร์โทร <span class="en">Phone</span></label>
+            <input type="tel" id="reporter-phone" placeholder="0812345678">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 2: Location -->
+    <div class="section-card">
+      <div class="section-title">📍 สถานที่พบเหตุ <span class="sub">Location</span></div>
+      <div class="section-body">
+        <div class="form-row">
+          <div class="field">
+            <label>อาคาร / โซน <span class="en">Building / Zone</span> <span class="req">*</span></label>
+            <input type="text" id="location-building" placeholder="เช่น อาคาร A / โรงงาน 1" required>
+          </div>
+          <div class="field">
+            <label>พื้นที่ / จุดที่พบ <span class="en">Specific Area</span> <span class="req">*</span></label>
+            <input type="text" id="location-area" placeholder="เช่น ชั้น 2 / ห้อง Compressor" required>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 3: Observation Type -->
+    <div class="section-card">
+      <div class="section-title">🔍 ประเภทข้อสังเกต <span class="sub">Observation Type</span></div>
+      <div class="section-body">
+        <div class="field">
+          <label>เลือกประเภท <span class="en">Select Type</span> <span class="req">*</span></label>
+          <div class="type-selector" id="type-selector">
+            <button type="button" class="type-btn" data-type="Unsafe Condition" onclick="selectType(this)">
+              ⚠️ สภาพไม่ปลอดภัย<br><small>Unsafe Condition</small>
+            </button>
+            <button type="button" class="type-btn" data-type="Unsafe Act" onclick="selectType(this)">
+              🚷 พฤติกรรมไม่ปลอดภัย<br><small>Unsafe Act</small>
+            </button>
+            <button type="button" class="type-btn" data-type="Near Miss" onclick="selectType(this)">
+              💫 เกือบเกิดอุบัติเหตุ<br><small>Near Miss</small>
+            </button>
+            <button type="button" class="type-btn" data-type="Good Practice" onclick="selectType(this)">
+              ✅ แนวปฏิบัติที่ดี<br><small>Good Practice</small>
+            </button>
+          </div>
+          <input type="hidden" id="obs-type" required>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 4: Description -->
+    <div class="section-card">
+      <div class="section-title">📝 รายละเอียดข้อสังเกต <span class="sub">Observation Details</span></div>
+      <div class="section-body">
+        <div class="form-row full">
+          <div class="field">
+            <label>คำอธิบายสิ่งที่พบ <span class="en">Describe what was observed</span> <span class="req">*</span></label>
+            <textarea id="obs-description" placeholder="อธิบายรายละเอียดของสภาพหรือพฤติกรรมที่พบ / Describe the unsafe condition or act in detail..." required></textarea>
+          </div>
+        </div>
+        <div class="form-row full">
+          <div class="field">
+            <label>ข้อเสนอแนะในการแก้ไข <span class="en">Suggested Corrective Action</span></label>
+            <textarea id="obs-suggestion" placeholder="ข้อเสนอแนะหรือวิธีแก้ไขที่เป็นไปได้ / Suggested fix or preventive measure..." style="min-height:60px;"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 5: Risk Level -->
+    <div class="section-card">
+      <div class="section-title">🎯 ระดับความเสี่ยง <span class="sub">Risk Level Assessment</span></div>
+      <div class="section-body">
+        <div class="field">
+          <label>ประเมินระดับความเสี่ยง <span class="en">Select risk level</span> <span class="req">*</span></label>
+          <div class="risk-selector">
+            <button type="button" class="risk-btn" data-level="HIGH" onclick="selectRisk(this)">
+              <span class="emoji">🔴</span>
+              <span class="label">HIGH สูง</span>
+              <span class="sublabel">อันตรายร้ายแรงทันที<br>Immediate serious risk</span>
+              <span class="timeline">⏰ แก้ไขภายใน 24 ชม.</span>
+            </button>
+            <button type="button" class="risk-btn" data-level="MEDIUM" onclick="selectRisk(this)">
+              <span class="emoji">🟡</span>
+              <span class="label">MEDIUM กลาง</span>
+              <span class="sublabel">อาจเกิดการบาดเจ็บ<br>Potential for injury</span>
+              <span class="timeline">📅 แก้ไขภายใน 7 วัน</span>
+            </button>
+            <button type="button" class="risk-btn" data-level="LOW" onclick="selectRisk(this)">
+              <span class="emoji">🟢</span>
+              <span class="label">LOW ต่ำ</span>
+              <span class="sublabel">ความเสี่ยงต่ำ<br>Low immediate risk</span>
+              <span class="timeline">📋 แก้ไขภายใน 30 วัน</span>
+            </button>
+          </div>
+          <input type="hidden" id="risk-level" required>
+          <div class="high-risk-alert" id="high-risk-alert">
+            🚨 HIGH RISK: แจ้งหัวหน้างาน / HSE Officer ทันที! — Notify supervisor immediately and take immediate corrective action!
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 6: Photo -->
+    <div class="section-card">
+      <div class="section-title">📸 รูปถ่ายประกอบ <span class="sub">Supporting Photos (Optional)</span></div>
+      <div class="section-body">
+        <div class="photo-drop" onclick="document.getElementById('photo-input').click()">
+          <input type="file" id="photo-input" accept="image/*" multiple onchange="previewPhotos(event)">
+          <div class="icon">📷</div>
+          <p>แตะเพื่อถ่ายภาพหรือเลือกรูปภาพ<br>Tap to take photo or select images</p>
+        </div>
+        <div class="photo-previews" id="photo-previews"></div>
+      </div>
+    </div>
+
+    <!-- Section 7: Signature -->
+    <div class="section-card">
+      <div class="section-title">✍️ ยืนยันการรายงาน <span class="sub">Confirmation & Signature</span></div>
+      <div class="section-body">
+        <div class="form-row full">
+          <div class="field">
+            <label style="display:flex; align-items:flex-start; gap:10px; cursor:pointer; font-weight:normal;">
+              <input type="checkbox" id="confirm-check" style="width:18px;height:18px;margin-top:2px;flex-shrink:0;" required>
+              <span>
+                ข้าพเจ้าขอรับรองว่าข้อมูลที่รายงานเป็นความจริง และยินดีให้ความร่วมมือในการแก้ไขปัญหา<br>
+                <em style="color:#666; font-size:12px;">I certify that the information reported is accurate and I am willing to cooperate in the corrective process.</em>
+              </span>
+            </label>
+          </div>
+        </div>
+        <button type="submit" class="submit-btn">
+          📤 ส่ง SOC Card / Submit Observation
+        </button>
+      </div>
+    </div>
+
+  </form>
+</div>
+
+<script>
+  // Set default date/time
+  const now = new Date();
+  document.getElementById('obs-date').value = now.toISOString().split('T')[0];
+  document.getElementById('obs-time').value = now.toTimeString().slice(0,5);
+
+  function selectType(btn) {
+    document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('obs-type').value = btn.dataset.type;
+  }
+
+  function selectRisk(btn) {
+    document.querySelectorAll('.risk-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('risk-level').value = btn.dataset.level;
+    const alert = document.getElementById('high-risk-alert');
+    if (btn.dataset.level === 'HIGH') alert.classList.add('visible');
+    else alert.classList.remove('visible');
+  }
+
+  function previewPhotos(event) {
+    const container = document.getElementById('photo-previews');
+    container.innerHTML = '';
+    Array.from(event.target.files).forEach(file => {
+      const img = document.createElement('img');
+      img.className = 'photo-preview';
+      img.src = URL.createObjectURL(file);
+      container.appendChild(img);
+    });
+  }
+
+  // Generate SOC number
+  function generateSOCNumber() {
+    const y = new Date().getFullYear();
+    const m = String(new Date().getMonth()+1).padStart(2,'0');
+    const n = String(Math.floor(Math.random()*900)+100);
+    return `SOC-${y}${m}-${n}`;
+  }
+
+  // ── Google Apps Script URL ──────────────────────────────────────────────
+  const GAS_URL = 'https://script.google.com/macros/s/AKfycbzkTvucZwf7HogClo9lAk94HWEHVXraFcxNQ0mv5oGZkJvL36K02Bk_8ESWa6Wtc2rE/exec';
+
+  function calcDueDate(risk, fromDate) {
+    const days = { HIGH: 1, MEDIUM: 7, LOW: 30 };
+    const d = new Date(fromDate);
+    d.setDate(d.getDate() + (days[risk] || 7));
+    return d.toISOString().split('T')[0];
+  }
+
+  document.getElementById('soc-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const type = document.getElementById('obs-type').value;
+    const risk = document.getElementById('risk-level').value;
+    if (!type) { alert('กรุณาเลือกประเภทข้อสังเกต / Please select observation type'); return; }
+    if (!risk) { alert('กรุณาเลือกระดับความเสี่ยง / Please select risk level'); return; }
+
+    // Loading state
+    const submitBtn = document.querySelector('.submit-btn');
+    submitBtn.textContent = '⏳ กำลังส่งข้อมูล... / Submitting...';
+    submitBtn.disabled = true;
+
+    const obsDate = document.getElementById('obs-date').value;
+    const socNum = generateSOCNumber();
+
+    const entry = {
+      id: socNum,
+      date: obsDate,
+      time: document.getElementById('obs-time').value,
+      reporter: document.getElementById('reporter-name').value,
+      dept: document.getElementById('reporter-dept').value,
+      phone: document.getElementById('reporter-phone').value,
+      building: document.getElementById('location-building').value,
+      area: document.getElementById('location-area').value,
+      type: type,
+      risk: risk,
+      description: document.getElementById('obs-description').value,
+      suggestion: document.getElementById('obs-suggestion').value,
+      due: calcDueDate(risk, obsDate),
+      submittedAt: new Date().toISOString()
+    };
+
+    // ── ส่งเข้า Google Sheets ผ่าน hidden iframe (วิธีเดียวที่ bypass CORS ได้) ──
+    try {
+      let iframe = document.getElementById('gas-iframe');
+      if (!iframe) {
+        iframe = document.createElement('iframe');
+        iframe.id = 'gas-iframe';
+        iframe.name = 'gas-iframe';
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
+      }
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = GAS_URL;
+      form.target = 'gas-iframe';
+      form.style.display = 'none';
+      const inp = document.createElement('input');
+      inp.type = 'hidden';
+      inp.name = 'payload';
+      inp.value = JSON.stringify(entry);
+      form.appendChild(inp);
+      document.body.appendChild(form);
+      form.submit();
+      setTimeout(() => { try { form.remove(); } catch(e){} }, 3000);
+    } catch (err) {
+      console.warn('Could not reach Google Sheets:', err);
+    }
+
+    // ── แสดงหน้า Confirmation ─────────────────────────────────────────
+    document.getElementById('soc-number-display').textContent = socNum;
+    const riskMsgs = {
+      HIGH: '🔴 HIGH RISK: ต้องดำเนินการแก้ไขภายใน 24 ชั่วโมง — Corrective action required within 24 hours.',
+      MEDIUM: '🟡 MEDIUM RISK: ต้องดำเนินการแก้ไขภายใน 7 วัน — Corrective action required within 7 days.',
+      LOW: '🟢 LOW RISK: ต้องดำเนินการแก้ไขภายใน 30 วัน — Corrective action required within 30 days.'
+    };
+    document.getElementById('conf-risk-msg').textContent = riskMsgs[risk];
+    document.getElementById('soc-form').style.display = 'none';
+    document.getElementById('confirmation').classList.add('visible');
+    window.scrollTo(0, 0);
+
+    submitBtn.textContent = '📤 ส่ง SOC Card / Submit Observation';
+    submitBtn.disabled = false;
+  });
+
+  function resetForm() {
+    document.getElementById('soc-form').reset();
+    document.getElementById('soc-form').style.display = 'block';
+    document.getElementById('confirmation').classList.remove('visible');
+    document.querySelectorAll('.type-btn, .risk-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('obs-type').value = '';
+    document.getElementById('risk-level').value = '';
+    document.getElementById('photo-previews').innerHTML = '';
+    document.getElementById('high-risk-alert').classList.remove('visible');
+    const now = new Date();
+    document.getElementById('obs-date').value = now.toISOString().split('T')[0];
+    document.getElementById('obs-time').value = now.toTimeString().slice(0,5);
+  }
+</script>
+</body>
+</html>
